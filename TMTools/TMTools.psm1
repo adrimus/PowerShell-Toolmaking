@@ -7,16 +7,18 @@ function Get-TMRemoteListeningConfiguration {
         $ComputerName="localhost",
 
         # Parameter help description
-        [Parameter(AttributeValues)]
+        [Parameter()]
         [string]
         $ErrorLog
     )
         
     process {
+        $ports = 22,5985,5986
         foreach ($computer in $ComputerName) {
-
-            $cimsession = New-CimSession sysw10m40
-            Get-NetTCPConnection -CimSession $cimsession -State Listen -LocalPort 5985,5986,22 | Select-Object pscomputername,localport,state
+            foreach ($port in $ports) {
+                Test-NetConnection -port $port -ComputerName $computer |
+                Select-Object ComputerName,RemotePort,TCPTestSucceeded
+            } #foreach
         } #foreach
         #TODO
         #better output
